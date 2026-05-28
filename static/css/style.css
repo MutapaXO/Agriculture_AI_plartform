@@ -1,0 +1,252 @@
+/* =========================
+   GLOBAL STYLES
+========================= */
+
+body {
+
+    margin: 0;
+    padding: 0;
+
+    font-family: Arial, sans-serif;
+
+    background: #0f172a;
+
+    color: white;
+}
+
+/* =========================
+   HEADER
+========================= */
+
+header {
+
+    text-align: center;
+
+    padding: 30px;
+
+    background: #111827;
+
+    border-bottom: 2px solid #1e293b;
+}
+
+header h1 {
+
+    margin: 0;
+
+    color: #38bdf8;
+
+    font-size: 40px;
+}
+
+header p {
+
+    color: #94a3b8;
+
+    margin-top: 10px;
+}
+
+/* =========================
+   SENSOR GRID
+========================= */
+
+.sensor-grid {
+
+    display: grid;
+
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+
+    gap: 20px;
+
+    padding: 20px;
+}
+
+/* =========================
+   CARD STYLES
+========================= */
+
+.card,
+.health-card,
+.ai-card,
+.control-card,
+.image-card,
+.chart-card {
+
+    background: #1e293b;
+
+    border-radius: 15px;
+
+    padding: 20px;
+
+    box-shadow: 0px 4px 15px rgba(0,0,0,0.3);
+}
+
+.card h2 {
+
+    color: #38bdf8;
+
+    margin-bottom: 10px;
+}
+
+.card p {
+
+    font-size: 30px;
+
+    font-weight: bold;
+}
+
+/* =========================
+   HEALTH STATUS
+========================= */
+
+.health-section {
+
+    padding: 20px;
+}
+
+.status-item {
+
+    display: flex;
+
+    justify-content: space-between;
+
+    margin: 15px 0;
+
+    font-size: 18px;
+}
+
+.good {
+
+    color: #22c55e;
+}
+
+.low {
+
+    color: #38bdf8;
+}
+
+.normal {
+
+    color: #facc15;
+}
+
+/* =========================
+   AI ANALYSIS
+========================= */
+
+.ai-section {
+
+    padding: 20px;
+}
+
+.ai-card h2 {
+
+    color: #38bdf8;
+}
+
+pre {
+
+    background: #0f172a;
+
+    padding: 20px;
+
+    border-radius: 10px;
+
+    overflow-x: auto;
+
+    white-space: pre-wrap;
+
+    color: #e2e8f0;
+
+    min-height: 200px;
+}
+
+/* =========================
+   BUTTONS
+========================= */
+
+button {
+
+    background: #38bdf8;
+
+    color: white;
+
+    border: none;
+
+    padding: 12px 20px;
+
+    border-radius: 10px;
+
+    cursor: pointer;
+
+    font-size: 16px;
+
+    transition: 0.3s;
+}
+
+button:hover {
+
+    background: #0ea5e9;
+}
+
+/* =========================
+   CONTROL PANEL
+========================= */
+
+.control-section {
+
+    padding: 20px;
+}
+
+.button-grid {
+
+    display: grid;
+
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+
+    gap: 15px;
+}
+
+/* =========================
+   IMAGE SECTION
+========================= */
+
+.image-section {
+
+    padding: 20px;
+}
+
+.image-card ul {
+
+    margin-top: 15px;
+}
+
+.image-card li {
+
+    margin-bottom: 10px;
+}
+
+/* =========================
+   CHART SECTION
+========================= */
+
+.chart-section {
+
+    padding: 20px;
+}
+
+/* =========================
+   RESPONSIVE DESIGN
+========================= */
+
+@media(max-width: 768px) {
+
+    header h1 {
+
+        font-size: 28px;
+    }
+
+    .card p {
+
+        font-size: 24px;
+    }
+}

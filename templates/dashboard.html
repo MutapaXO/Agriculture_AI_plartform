@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>AI Hydroponic Dashboard</title>
+
+    <link rel="stylesheet"
+    href="{{ url_for('static', filename='css/style.css') }}">
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+</head>
+
+<body>
+
+    <!-- HEADER -->
+    <header>
+
+        <h1>AI Hydroponic Agriculture Platform</h1>
+
+        <p>Smart Precision Farming Dashboard</p>
+
+    </header>
+
+    <!-- SENSOR SECTION -->
+    <section class="sensor-grid">
+
+        <div class="card">
+            <h2>🌡 Temperature</h2>
+            <p id="temperature">--</p>
+        </div>
+
+        <div class="card">
+            <h2>💧 Humidity</h2>
+            <p id="humidity">--</p>
+        </div>
+
+        <div class="card">
+            <h2>🧪 TDS</h2>
+            <p id="tds">--</p>
+        </div>
+
+        <div class="card">
+            <h2>🚰 Water Level</h2>
+            <p id="water_level">--</p>
+        </div>
+
+        <div class="card">
+            <h2>☀ Light Level</h2>
+            <p id="light_level">--</p>
+        </div>
+
+    </section>
+
+    <!-- HEALTH STATUS -->
+    <section class="health-section">
+
+        <div class="health-card">
+
+            <h2>Plant Health Status</h2>
+
+            <div class="status-item">
+                <span>Plant Health</span>
+                <span class="good">GOOD</span>
+            </div>
+
+            <div class="status-item">
+                <span>Risk Level</span>
+                <span class="low">LOW</span>
+            </div>
+
+            <div class="status-item">
+                <span>Growth Status</span>
+                <span class="normal">NORMAL</span>
+            </div>
+
+            <div class="status-item">
+                <span>Stress Index</span>
+                <span class="low">LOW</span>
+            </div>
+
+        </div>
+
+    </section>
+
+    <!-- AI ANALYSIS -->
+    <section class="ai-section">
+
+        <div class="ai-card">
+
+            <h2>🤖 AI Analysis</h2>
+
+            <pre id="analysis">
+Click "Run AI Analysis" to generate insights...
+            </pre>
+
+            <button onclick="runAI()">Run AI Analysis</button>
+
+        </div>
+
+    </section>
+
+    <!-- CONTROL PANEL -->
+    <section class="control-section">
+
+        <div class="control-card">
+
+            <h2>🎛 Control Panel</h2>
+
+            <div class="button-grid">
+
+                <button onclick="controlDevice('pump1')">
+                    Pump 1
+                </button>
+
+                <button onclick="controlDevice('pump2')">
+                    Pump 2
+                </button>
+
+                <button onclick="controlDevice('pump3')">
+                    Pump 3
+                </button>
+
+                <button onclick="controlDevice('led')">
+                    LED ON/OFF
+                </button>
+
+                <button onclick="controlDevice('auto')">
+                    Auto Mode
+                </button>
+
+            </div>
+
+        </div>
+
+    </section>
+
+    <!-- IMAGE ANALYSIS -->
+    <section class="image-section">
+
+        <div class="image-card">
+
+            <h2>📷 Plant Image Analysis</h2>
+
+            <input type="file">
+
+            <button>
+                Analyze Plant Image
+            </button>
+
+            <p>
+                Upload plant images for:
+            </p>
+
+            <ul>
+                <li>Deficiency Detection</li>
+                <li>Pest Detection</li>
+                <li>Growth Stage Estimation</li>
+            </ul>
+
+        </div>
+
+    </section>
+
+    <!-- CHARTS -->
+    <section class="chart-section">
+
+        <div class="chart-card">
+
+            <h2>📈 Sensor Trends</h2>
+
+            <canvas id="sensorChart"></canvas>
+
+        </div>
+
+    </section>
+
+    <script src="{{ url_for('static', filename='js/dashboard.js') }}"></script>
+
+</body>
+
+</html>
