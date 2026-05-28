@@ -58,9 +58,7 @@ export default function DashboardConcept() {
 
     try {
 
-      const response = await fetch(
-        "http://127.0.0.1:5000/api/sensor-data"
-      );
+      const response = await fetch("https://agriculture-ai-backend.onrender.com/api/sensor-data");
 
       const data = await response.json();
 
@@ -84,9 +82,7 @@ export default function DashboardConcept() {
 
     try {
 
-      const response = await fetch(
-        "http://127.0.0.1:5000/api/ai-analysis"
-      );
+      const response = await fetch("https://agriculture-ai-backend.onrender.com/api/ai-analysis");
 
       const data = await response.json();
 
@@ -565,7 +561,7 @@ export default function DashboardConcept() {
 <div className="aspect-video bg-black rounded-2xl overflow-hidden">
 
   <img
-    src={`http://192.168.1.107:5000/latest-image?t=${Date.now()}`}
+    src={`https://agriculture-ai-backend.onrender.com/latest-image?t=${Date.now()}`}
     alt="Plant Feed"
     className="w-full h-full object-cover"
   />
