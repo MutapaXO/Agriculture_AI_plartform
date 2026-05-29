@@ -25,6 +25,15 @@ ChartJS.register(
 
 export default function DashboardConcept() {
 
+ 
+const [relayStates, setRelayStates] = useState({
+  pump1: false,
+  pump2: false,
+  pump3: false,
+  light: false,
+});
+
+
   // =========================
   // SENSOR DATA
   // =========================
@@ -95,7 +104,46 @@ export default function DashboardConcept() {
     }
 
   };
+   
+const sendControlCommand = async (device, state) => {
 
+  try {
+
+    await fetch(
+      "http://127.0.0.1:5000/api/control",
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          device,
+          state,
+        }),
+      }
+    );
+
+    setRelayStates(prev => ({
+      ...prev,
+      [device]: state,
+    }));
+
+  } catch (error) {
+
+    console.error(error);
+
+  }
+
+};
+
+const toggleLight = () => {
+
+  sendControlCommand(
+    "light",
+    !relayStates.light
+  );
+
+};
   // =========================
   // AUTO UPDATE
   // =========================
@@ -103,6 +151,9 @@ export default function DashboardConcept() {
 
     fetchSensorData();
     fetchAIAnalysis();
+    
+
+
 
     const interval = setInterval(() => {
 
@@ -635,27 +686,102 @@ export default function DashboardConcept() {
 
             </div>
 
-            <div className="grid grid-cols-2 gap-4">
 
-              {[
-                "Water Pump",
-                "Nutrient Pump A",
-                "Nutrient Pump B",
-                "LED Grow Lights",
-                "Auto Mode",
-                "AI Assistance",
-              ].map((control, index) => (
 
-                <button
-                  key={index}
-                  className="bg-cyan-500/10 border border-cyan-500/30 hover:bg-cyan-500 hover:text-black transition rounded-2xl p-4 font-semibold"
-                >
 
-                  {control}
+<div className="grid grid-cols-2 gap-4">
 
-                </button>
+  {/* WATER PUMP */}
+  <button
+    onMouseDown={() =>
+      sendControlCommand("pump1", true)
+    }
+    onMouseUp={() =>
+      sendControlCommand("pump1", false)
+    }
+    onMouseLeave={() =>
+      sendControlCommand("pump1", false)
+    }
+    className={`rounded-2xl p-4 font-semibold transition border
+    ${
+      relayStates.pump1
+        ? "bg-green-500/20 border-green-400 shadow-lg shadow-green-500/40"
+        : "bg-red-500/10 border-red-500/40 shadow-lg shadow-red-500/20"
+    }`}
+  >
+    Water Pump
+    <div className="text-xs mt-2">
+      Hold To Run
+    </div>
+  </button>
 
-              ))}
+  {/* NUTRIENT A */}
+  <button
+    onMouseDown={() =>
+      sendControlCommand("pump2", true)
+    }
+    onMouseUp={() =>
+      sendControlCommand("pump2", false)
+    }
+    onMouseLeave={() =>
+      sendControlCommand("pump2", false)
+    }
+    className={`rounded-2xl p-4 font-semibold transition border
+    ${
+      relayStates.pump2
+        ? "bg-green-500/20 border-green-400 shadow-lg shadow-green-500/40"
+        : "bg-red-500/10 border-red-500/40 shadow-lg shadow-red-500/20"
+    }`}
+  >
+    Nutrient Pump A
+    <div className="text-xs mt-2">
+      Hold To Dose
+    </div>
+  </button>
+
+  {/* NUTRIENT B */}
+  <button
+    onMouseDown={() =>
+      sendControlCommand("pump3", true)
+    }
+    onMouseUp={() =>
+      sendControlCommand("pump3", false)
+    }
+    onMouseLeave={() =>
+      sendControlCommand("pump3", false)
+    }
+    className={`rounded-2xl p-4 font-semibold transition border
+    ${
+      relayStates.pump3
+        ? "bg-green-500/20 border-green-400 shadow-lg shadow-green-500/40"
+        : "bg-red-500/10 border-red-500/40 shadow-lg shadow-red-500/20"
+    }`}
+  >
+    Nutrient Pump B
+    <div className="text-xs mt-2">
+      Hold To Dose
+    </div>
+  </button>
+
+  {/* LED */}
+  <button
+    onClick={toggleLight}
+    className={`rounded-2xl p-4 font-semibold transition border
+    ${
+      relayStates.light
+        ? "bg-green-500/20 border-green-400 shadow-lg shadow-green-500/40"
+        : "bg-red-500/10 border-red-500/40 shadow-lg shadow-red-500/20"
+    }`}
+  >
+    LED Grow Lights
+    <div className="text-xs mt-2">
+      {relayStates.light ? "ON" : "OFF"}
+    </div>
+  </button>
+
+
+
+
 
             </div>
 
@@ -734,7 +860,7 @@ export default function DashboardConcept() {
         </div>
 
       </div>
-
+     
     </div>
 
   );

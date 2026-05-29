@@ -1,5 +1,7 @@
+
 #include <WiFi.h>
 #include <HTTPClient.h>
+#include <WiFiClientSecure.h>
 #include <ArduinoJson.h>
 
 // =========================
@@ -9,10 +11,21 @@ const char* ssid = "Room-301";
 const char* password = "Aditya@A9";
 
 // =========================
-// FLASK SERVER
+// CLOUD URLS
 // =========================
-const char* serverName =
-"http://192.168.1.107:5000/update-sensors";
+const char* sensorURL =
+  "https://agriculture-ai-backend.onrender.com/update-sensors";
+
+const char* commandURL =
+  "https://agriculture-ai-backend.onrender.com/api/commands";
+
+// =========================
+// RELAY PINS
+// =========================
+#define RELAY1 18   // Water Pump
+#define RELAY2 19   // Nutrient Pump A
+#define RELAY3 23   // Nutrient Pump B
+#define RELAY4 5    // Grow Light
 
 // =========================
 // SENSOR VARIABLES
@@ -25,11 +38,84 @@ int lightLevel = 650;
 float ph = 6.2;
 
 // =========================
+// READ CLOUD COMMANDS
+// =========================
+
+void checkCommands() {
+
+  if (WiFi.status() != WL_CONNECTED)
+    return;
+
+  HTTPClient http;
+
+  http.begin(commandURL);
+
+  int httpCode = http.GET();
+
+  Serial.print("Command HTTP Code: ");
+  Serial.println(httpCode);
+
+  if (httpCode == 200) {
+
+    String payload = http.getString();
+
+    Serial.println(payload);
+
+    StaticJsonDocument<300> doc;
+
+    DeserializationError error =
+      deserializeJson(doc, payload);
+
+    if (!error) {
+
+      bool pump1 = doc["pump1"];
+      bool pump2 = doc["pump2"];
+      bool pump3 = doc["pump3"];
+      bool light = doc["light"];
+
+      digitalWrite(RELAY1, pump1 ? LOW : HIGH);
+      digitalWrite(RELAY2, pump2 ? LOW : HIGH);
+      digitalWrite(RELAY3, pump3 ? LOW : HIGH);
+      digitalWrite(RELAY4, light ? LOW : HIGH);
+
+      Serial.println("Commands Updated");
+
+      Serial.print("Pump1: ");
+      Serial.println(pump1);
+
+      Serial.print("Pump2: ");
+      Serial.println(pump2);
+
+      Serial.print("Pump3: ");
+      Serial.println(pump3);
+
+      Serial.print("Light: ");
+      Serial.println(light);
+    }
+  }
+
+  http.end();
+}
+
+
+
+// =========================
 // SETUP
 // =========================
 void setup() {
 
   Serial.begin(115200);
+
+  pinMode(RELAY1, OUTPUT);
+  pinMode(RELAY2, OUTPUT);
+  pinMode(RELAY3, OUTPUT);
+  pinMode(RELAY4, OUTPUT);
+
+  // Relay OFF initially
+  digitalWrite(RELAY1, HIGH);
+  digitalWrite(RELAY2, HIGH);
+  digitalWrite(RELAY3, HIGH);
+  digitalWrite(RELAY4, HIGH);
 
   WiFi.begin(ssid, password);
 
@@ -39,78 +125,100 @@ void setup() {
 
     delay(500);
     Serial.print(".");
-
   }
 
   Serial.println("");
   Serial.println("WiFi connected");
-
 }
 
 // =========================
 // LOOP
 // =========================
+
 void loop() {
 
-  if (WiFi.status() == WL_CONNECTED) {
+  static unsigned long lastSensorUpload = 0;
+  static unsigned long lastCommandCheck = 0;
 
-    HTTPClient http;
+  // =========================
+  // CHECK RELAY COMMANDS
+  // EVERY 200ms
+  // =========================
+  if (millis() - lastCommandCheck >= 200) {
 
-    http.begin(serverName);
+    lastCommandCheck = millis();
 
-    http.addHeader("Content-Type", "application/json");
+    if (WiFi.status() == WL_CONNECTED) {
 
-    // =========================
-    // CREATE JSON
-    // =========================
-    StaticJsonDocument<300> doc;
+      checkCommands();
 
-    doc["temperature"] = temperature;
-    doc["humidity"] = humidity;
-    doc["tds"] = tds;
-    doc["water_level"] = waterLevel;
-    doc["light_level"] = lightLevel;
-    doc["ph"] = ph;
-
-    doc["plant"] = "Lettuce";
-    doc["week"] = 2;
-
-    String jsonData;
-
-    serializeJson(doc, jsonData);
-
-    // =========================
-    // SEND TO FLASK
-    // =========================
-    int httpResponseCode =
-      http.POST(jsonData);
-
-    Serial.print("HTTP Response: ");
-
-    Serial.println(httpResponseCode);
-
-    http.end();
-
+    }
   }
 
   // =========================
-  // SIMULATE SENSOR CHANGES
+  // UPLOAD SENSOR DATA
+  // EVERY 5 SECONDS
   // =========================
-  temperature += 0.1;
+  if (millis() - lastSensorUpload >= 5000) {
 
-  if (temperature > 30)
-    temperature = 25;
+    lastSensorUpload = millis();
 
-  humidity += 1;
+    if (WiFi.status() == WL_CONNECTED) {
 
-  if (humidity > 70)
-    humidity = 40;
+      WiFiClientSecure client;
+      client.setInsecure();
 
-  tds += 5;
+      HTTPClient http;
 
-  if (tds > 700)
-    tds = 450;
+      http.begin(client, sensorURL);
 
-  delay(5000);
+      http.addHeader(
+        "Content-Type",
+        "application/json"
+      );
 
+      StaticJsonDocument<300> doc;
+
+      doc["temperature"] = temperature;
+      doc["humidity"] = humidity;
+      doc["tds"] = tds;
+      doc["water_level"] = waterLevel;
+      doc["light_level"] = lightLevel;
+      doc["ph"] = ph;
+
+      doc["plant"] = "Lettuce";
+      doc["week"] = 2;
+
+      String jsonData;
+
+      serializeJson(doc, jsonData);
+
+      int httpResponseCode =
+        http.POST(jsonData);
+
+      Serial.print("Sensor Upload: ");
+      Serial.println(httpResponseCode);
+
+      http.end();
+
+      // =========================
+      // SIMULATED SENSOR DATA
+      // =========================
+      temperature += 0.1;
+
+      if (temperature > 30)
+        temperature = 25;
+
+      humidity += 1;
+
+      if (humidity > 70)
+        humidity = 40;
+
+      tds += 5;
+
+      if (tds > 700)
+        tds = 450;
+    }
+  }
 }
+

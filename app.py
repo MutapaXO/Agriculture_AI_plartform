@@ -17,7 +17,9 @@ CORS(app)
 # =========================
 # GROQ CLIENT
 # =========================
-client = Groq( api_key=os.environ.get("GROQ_API_KEY") )
+client = Groq(
+    api_key=os.environ.get("GROQ_API_KEY")
+) 
 
 # =========================
 # CENTRAL SENSOR STORAGE
@@ -35,7 +37,13 @@ sensor_data = {
     "week": 2
 
 }
-
+relay_states = {
+    "pump1": False,
+    "pump2": False,
+    "pump3": False,
+    "light": False,
+    "auto_mode": False
+}
 # =========================
 # AI CACHE
 # =========================
@@ -197,6 +205,29 @@ def latest_image():
 # =========================
 # MAIN
 # =========================
+@app.route('/api/control', methods=['POST'])
+def control_device():
+
+    global relay_states
+
+    data = request.json
+
+    device = data.get("device")
+    state = data.get("state")
+
+    if device in relay_states:
+        relay_states[device] = state
+
+    return jsonify({
+        "success": True,
+        "relay_states": relay_states
+    })
+
+
+@app.route('/api/commands')
+def get_commands():
+
+    return jsonify(relay_states)
 if __name__ == "__main__":
 
     app.run(
