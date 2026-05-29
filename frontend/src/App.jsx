@@ -110,7 +110,7 @@ const sendControlCommand = async (device, state) => {
   try {
 
     await fetch(
-      "http://127.0.0.1:5000/api/control",
+  "https://agriculture-ai-backend.onrender.com/api/control",
       {
         method: "POST",
         headers: {
