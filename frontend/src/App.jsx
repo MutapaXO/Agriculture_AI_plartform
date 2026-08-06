@@ -6,26 +6,18 @@ ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, Title, T
 
 export default function DashboardConcept() {
   const [relayStates, setRelayStates] = useState({ pump1: false, pump2: false, pump3: false, light: false, pump4: false });
-  const [sensorData, setSensorData] = useState({ temperature: 33, humidity: 45, tds: 1050, water_level: 78, light_level: 450, ph: "6.2" });
+  const [sensorData, setSensorData] = useState({ temperature: 33, humidity: 45, tds: 1050, water_level: 78, light_level: 650, ph: "6.2" });
   const [aiAnalysis, setAiAnalysis] = useState("AI is analyzing the stressed environment...");
   const [visionData, setVisionData] = useState({ plant: "Lettuce Romaine", growth_stage: "3 weeks", condition: "Moderate to Severe Stress" });
   const [historyMetric, setHistoryMetric] = useState("Temperature");
   const [bioMetric, setBioMetric] = useState("Growth Tracking");
 
-  // Helper for Stressed Plant Condition
   const getConditionColor = () => {
     switch (visionData.condition) {
       case "Healthy": return "text-green-400";
       case "Moderate to Severe Stress": return "text-orange-400";
       default: return "text-slate-400";
     }
-  };
-
-  // ADDED: Helper for Simulated Light Status
-  const getLightInfo = (lux) => {
-    if (lux < 300) return { status: "Low", color: "border-purple-400", glow: "shadow-purple-500/30" };
-    if (lux < 600) return { status: "Optimal", color: "border-green-400", glow: "shadow-green-500/30" };
-    return { status: "Excessive", color: "border-orange-400", glow: "shadow-orange-500/30" };
   };
 
   const fetchSensorData = async () => {
@@ -63,18 +55,7 @@ export default function DashboardConcept() {
     return () => clearInterval(interval);
   }, []);
 
-  const lightInfo = getLightInfo(sensorData.light_level);
-
-  const sensors = [
-    { label: "Temperature", value: `${sensorData.temperature}°C`, status: "Critical", color: "border-red-400", glow: "shadow-red-500/30" },
-    { label: "Humidity", value: `${sensorData.humidity}%`, status: "Moderate", color: "border-orange-400", glow: "shadow-orange-500/30" },
-    { label: "TDS", value: `${sensorData.tds} ppm`, status: "Ideal", color: "border-green-400", glow: "shadow-green-500/30" },
-    { label: "Water Level", value: `${sensorData.water_level}%`, status: "Good", color: "border-green-400", glow: "shadow-green-500/30" },
-    { label: "Light", value: `${sensorData.light_level} lux`, status: lightInfo.status, color: lightInfo.color, glow: lightInfo.glow },
-    { label: "pH Level", value: sensorData.ph, status: "Ideal", color: "border-green-400", glow: "shadow-green-500/30" },
-  ];
-
-  // Preserved: Stressed/Declining Plant Data
+  // Biological Charts: Declining Health and Rising Stress
   const biologicalGraphs = {
     "Growth Tracking": {
       labels: ["Week 1", "Week 2", "Week 3", "Week 4", "Week 5"],
@@ -93,8 +74,18 @@ export default function DashboardConcept() {
     },
   };
 
+  const sensors = [
+    { label: "Temperature", value: `${sensorData.temperature}°C`, status: "Critical", color: "border-red-400", glow: "shadow-red-500/30" },
+    { label: "Humidity", value: `${sensorData.humidity}%`, status: "Moderate", color: "border-orange-400", glow: "shadow-orange-500/30" },
+    { label: "TDS", value: `${sensorData.tds} ppm`, status: "Ideal", color: "border-green-400", glow: "shadow-green-500/30" },
+    { label: "Water Level", value: `${sensorData.water_level}%`, status: "Good", color: "border-green-400", glow: "shadow-green-500/30" },
+    { label: "Light", value: `${sensorData.light_level} lux`, status: "Healthy", color: "border-green-400", glow: "shadow-green-500/30" },
+    { label: "pH Level", value: sensorData.ph, status: "Ideal", color: "border-green-400", glow: "shadow-green-500/30" },
+  ];
+
   return (
     <div className="min-h-screen bg-[#060816] text-white p-6">
+      {/* HEADER */}
       <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-6 mb-8">
         <div>
           <h1 className="text-4xl font-bold tracking-tight">Agriculture Intelligence Platform</h1>
@@ -111,28 +102,25 @@ export default function DashboardConcept() {
         <div className="xl:col-span-2 space-y-6">
           {/* SENSOR CARDS */}
           <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-5">
-            {sensors.map((sensor, index) => (
-              <div key={index} className={`bg-[#10182b] rounded-3xl p-6 border ${sensor.color} shadow-2xl ${sensor.glow}`}>
+            {sensors.map((s, i) => (
+              <div key={i} className={`bg-[#10182b] rounded-3xl p-6 border ${s.color} shadow-2xl ${s.glow}`}>
                 <div className="flex justify-between mb-4">
-                  <h3 className="text-slate-300">{sensor.label}</h3>
-                  <div className={`w-4 h-4 rounded-full border-2 ${sensor.color}`} />
+                  <h3 className="text-slate-300">{s.label}</h3>
+                  <div className={`w-4 h-4 rounded-full border-2 ${s.color}`} />
                 </div>
                 <div className="flex items-center justify-center py-4">
-                  <div className={`w-32 h-32 rounded-full border-8 ${sensor.color} flex flex-col items-center justify-center`}>
-                    <div className="text-2xl font-bold">{sensor.value}</div>
-                    <div className="text-xs text-slate-400 mt-1">{sensor.status}</div>
+                  <div className={`w-32 h-32 rounded-full border-8 ${s.color} flex flex-col items-center justify-center`}>
+                    <div className="text-2xl font-bold">{s.value}</div>
+                    <div className="text-xs text-slate-400 mt-1">{s.status}</div>
                   </div>
                 </div>
               </div>
             ))}
           </div>
 
-          {/* AI INTELLIGENCE PANEL (STRESSED STATE) */}
+          {/* AI PANEL (Requested Stress Values) */}
           <div className="bg-[#10182b] rounded-3xl p-6 shadow-xl border border-slate-800">
-            <div className="flex justify-between items-center mb-5">
-              <h2 className="text-2xl font-semibold">AI Crop Intelligence</h2>
-              <div className="bg-red-500/20 text-red-400 px-4 py-2 rounded-xl text-sm font-medium">CRITICAL ALERT</div>
-            </div>
+            <h2 className="text-2xl font-semibold mb-4">AI Crop Intelligence</h2>
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-center">
               <div className="bg-[#0b1220] p-4 rounded-2xl border border-slate-800">
                 <p className="text-slate-400 text-sm">Growth Stage</p>
@@ -153,7 +141,7 @@ export default function DashboardConcept() {
             </div>
           </div>
 
-          {/* GRAPHS */}
+          {/* GROWTH INTELLIGENCE */}
           <div className="bg-[#10182b] rounded-3xl p-6 shadow-xl border border-slate-800">
             <div className="flex justify-between items-center mb-5">
               <h2 className="text-2xl font-semibold">Growth Intelligence</h2>
@@ -174,39 +162,43 @@ export default function DashboardConcept() {
             <div className="p-5 border-b border-slate-800"><h2 className="text-xl font-semibold">Live Plant Intelligence</h2></div>
             <div className="aspect-video bg-black overflow-hidden relative">
               <img src={`https://agriculture-ai-backend.onrender.com/latest-image?t=${Date.now()}`} alt="Feed" className="w-full h-full object-cover" />
-              <div className="absolute top-4 right-4 bg-red-600 text-[10px] px-2 py-1 rounded-full animate-pulse">HEAT STRESS</div>
             </div>
             <div className="p-5 space-y-3 text-sm">
               <div className="flex justify-between"><span className="text-slate-400">Plant</span><span>{visionData.plant}</span></div>
-              <div className="flex justify-between"><span className="text-slate-400">Stage</span><span>{visionData.growth_stage}</span></div>
+              <div className="flex justify-between"><span className="text-slate-400">Growth Stage</span><span>{visionData.growth_stage}</span></div>
               <div className="flex justify-between"><span className="text-slate-400">Condition</span><span className={getConditionColor()}>{visionData.condition}</span></div>
             </div>
           </div>
 
-          {/* CONTROLS */}
+          {/* CONTROLS (Restored Toggle/Hold Logic) */}
           <div className="bg-[#10182b] rounded-3xl p-6 shadow-xl border border-slate-800">
             <h2 className="text-2xl font-semibold mb-5">Smart Control Center</h2>
             <div className="grid grid-cols-2 gap-4">
               <button onClick={() => sendControlCommand("pump1", !relayStates.pump1)} className={`rounded-2xl p-4 font-semibold border ${relayStates.pump1 ? "bg-green-500/20 border-green-400" : "bg-red-500/10 border-red-500/40"}`}>
-                Water Pump <div className="text-xs">{relayStates.pump1 ? "ON" : "OFF"}</div>
+                Water Pump <div className="text-xs mt-2">{relayStates.pump1 ? "ON" : "OFF"}</div>
               </button>
-              <button onMouseDown={() => sendControlCommand("pump2", true)} onMouseUp={() => sendControlCommand("pump2", false)} className="rounded-2xl p-4 font-semibold border bg-red-500/10 border-red-500/40">
-                Nutrient A <div className="text-xs">Hold to Dose</div>
+              <button onMouseDown={() => sendControlCommand("pump2", true)} onMouseUp={() => sendControlCommand("pump2", false)} onMouseLeave={() => sendControlCommand("pump2", false)} className="rounded-2xl p-4 font-semibold border bg-red-500/10 border-red-500/40">
+                Nutrient Pump A <div className="text-xs mt-2">Hold to Dose</div>
               </button>
               <button onClick={() => sendControlCommand("light", !relayStates.light)} className={`rounded-2xl p-4 font-semibold border ${relayStates.light ? "bg-green-500/20 border-green-400" : "bg-red-500/10 border-red-500/40"}`}>
-                LED Lights <div className="text-xs">{relayStates.light ? "ON" : "OFF"}</div>
+                LED Lights <div className="text-xs mt-2">{relayStates.light ? "ON" : "OFF"}</div>
               </button>
-              <button onClick={() => sendControlCommand("pump4", !relayStates.pump4)} className={`rounded-2xl p-4 font-semibold border ${relayStates.pump4 ? "bg-green-500/20 border-green-400" : "bg-red-500/10 border-red-500/40"}`}>
-                Secondary Pump <div className="text-xs">{relayStates.pump4 ? "ON" : "OFF"}</div>
+              <button onClick={() => sendControlCommand("pump4", !relayStates.pump4)} className={`rounded-2xl p-4 font-semibold border ${relayStates.pump4 ? "bg-green-500/20 border-green-400 shadow-green-500/40" : "bg-red-500/10 border-red-500/40"}`}>
+                Secondary Pump <div className="text-xs mt-2">{relayStates.pump4 ? "ON" : "OFF"}</div>
               </button>
             </div>
           </div>
 
-          {/* AI RECOMMENDATIONS */}
+          {/* STATUS INDICATORS (Restored) */}
           <div className="bg-[#10182b] rounded-3xl p-6 shadow-xl border border-slate-800">
-            <h2 className="text-2xl font-semibold mb-5">AI Insights</h2>
-            <div className="bg-[#0b1220] rounded-2xl p-5 border border-slate-800 max-h-60 overflow-y-auto">
-              <p className="whitespace-pre-line text-slate-300 text-sm leading-6">{aiAnalysis}</p>
+            <h2 className="text-xl font-semibold mb-5">Platform Status</h2>
+            <div className="space-y-4">
+              {["AI Engine Online", "ESP32 Connected", "Cloud Sync Active", "Sensor Network Stable"].map((status, index) => (
+                <div key={index} className="flex items-center gap-3">
+                  <div className="w-3 h-3 rounded-full bg-green-400 animate-pulse" />
+                  <span className="text-slate-300">{status}</span>
+                </div>
+              ))}
             </div>
           </div>
         </div>

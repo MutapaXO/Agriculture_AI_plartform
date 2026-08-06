@@ -3,7 +3,7 @@ from flask_cors import CORS
 from groq import Groq
 import os
 import time
-import random # Added for simulation
+import random
 
 app = Flask(__name__)
 CORS(app)
@@ -11,14 +11,14 @@ CORS(app)
 client = Groq(api_key=os.environ.get("GROQ_API_KEY"))
 
 # =========================
-# CENTRAL STORAGE (Preserved)
+# CENTRAL STORAGE
 # =========================
 sensor_data = {
-    "temperature": 33, # Matches your high temp requirement
+    "temperature": 33,  # High temp causing the stress
     "humidity": 45,
     "tds": 1050,
     "water_level": 78,
-    "light_level": 450,
+    "light_level": 650, # Initial healthy reading
     "ph": 6.2,
     "plant": "Lettuce Romaine",
     "week": 3
@@ -35,7 +35,7 @@ relay_states = {
 
 latest_ai_analysis = "AI is currently analyzing the stressed environment..."
 
-# Preserved: Lettuce Romaine Stress Scenario
+# Scenario: Lettuce Romaine Stress
 latest_vision_data = {
     "plant": "Lettuce Romaine",
     "growth_stage": "3 weeks",
@@ -49,12 +49,10 @@ latest_vision_data = {
 @app.route('/api/sensor-data')
 def get_sensor_data():
     global sensor_data
-    # ADDED: Simulated Light Intensity Drifter
-    # This makes the light level move slightly on every refresh
-    drift = random.randint(-20, 20)
-    new_light = sensor_data.get("light_level", 450) + drift
-    sensor_data["light_level"] = max(150, min(900, new_light)) 
-    
+    # Healthy Simulation: Fluctuate slightly within optimal range (550-750)
+    drift = random.randint(-10, 10)
+    new_light = sensor_data.get("light_level", 650) + drift
+    sensor_data["light_level"] = max(550, min(750, new_light)) 
     return jsonify(sensor_data)
 
 @app.route("/update-sensors", methods=["POST"])
@@ -67,15 +65,12 @@ def update_sensors():
 def ai_analysis():
     global latest_ai_analysis
     global latest_vision_data
-
     try:
-        print("Generating fresh AI analysis for stressed crop...")
         prompt = f"""
-        Analyze this hydroponic system (STRESS SCENARIO).
-        Temp: {sensor_data['temperature']}C, TDS: {sensor_data['tds']}, Light: {sensor_data['light_level']}
-        Plant: {latest_vision_data['plant']}, Condition: {latest_vision_data['condition']}
-        Health Score is currently 44/100.
-        Provide specific recommendations to reduce heat and mitigate stress.
+        Analyze this hydroponic system.
+        Temp: {sensor_data['temperature']}C (Stressed), Light: {sensor_data['light_level']}lux (Healthy).
+        Plant: {latest_vision_data['plant']}, Condition: {latest_vision_data['condition']}.
+        Health Score: 44. Provide recommendation to reduce temperature.
         """
         response = client.chat.completions.create(
             model="llama-3.3-70b-versatile",
@@ -84,7 +79,6 @@ def ai_analysis():
         latest_ai_analysis = response.choices[0].message.content
     except Exception as e:
         print("AI ERROR:", e)
-
     return jsonify({"analysis": latest_ai_analysis, "vision": latest_vision_data})
 
 @app.route("/upload-image", methods=["POST"])
